@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css" />
+    <title> WILL GAMES </title>
+</head>
+
+<body>
+
+    <header style="display: flex;gap: 10px;">
+
+        <img class="dividi" src="./img/face4.jpg">
+
+        <h1 id="titulo">WILLGAMES</h1>
+
+        <a id="saite-1" href="https://www.instagram.com/_willgames?igsh=MXFtaGcyMWUzbHNjMg%3D%3D&utm_source=qr"
+            target="blank">Instragram</a>
+
+        <a id="saite-2" href="https://www.facebook.com/share/14TZMXdoDmn/?mibextid=wwXIfr" target="blank">facebook</a>
+
+        <a class="botao1" href="http://wa.me/5551998171711" target="_blank">
+            <img src="./img/watsapenovo.jpg" width="80px"></a>
+
+        <a class="botao2" href="https://maps.app.goo.gl/NL9AZWzRqrw3PwFm8" target="_blank">
+            <img src="./img/destino.png" width="80px"></a>
+
+        <a id="catalog-link" href="#catalogo">Catálogo</a>
+
+    </header>
+
+
+    <section id="catalogo" class="produtos-section">
+        <h2 class="produtos-titulo">Catálogo de Produtos</h2>
+        <a id="catalog-close" href="#" class="botao-voltar">Voltar</a>
+        <div class="catalogo-container">
+            <a class="wa-link" target="_blank"><img class="catalogo-item" src="img2/biblioteca%20de%20jogos%20hd.jpg"
+                    alt="biblioteca de jogos"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item" src="img2/desbloqueio%20de%20games.jpg"
+                    alt="desbloqueio de games"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item"
+                    src="img2/desbloqueio%20de%20mintendo%20swifit.jpg" alt="desbloqueio de mintendo swifit"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item" src="img2/estamos%20comrando%20controles.jpg"
+                    alt="estamos comprando controles"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item" src="img2/games%20de%20nova%20gercao.jpg"
+                    alt="games de nova geracao"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item" src="img2/horarrio%20de%20atendimento.jpg"
+                    alt="horario de atendimento"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item" src="img2/jogos%20disponiveis%20hd.jpg"
+                    alt="jogos disponiveis hd"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item" src="img2/pendraiver%20com%20jogos%20opl.jpg"
+                    alt="pendrive com jogos"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item"
+                    src="img2/realizamos%20manutençao%20de%20contrloes.jpg" alt="manutencao de controles"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item"
+                    src="img2/realizamos%20trocas%20de%20jogos.jpg" alt="trocas de jogos"></a>
+            <a class="wa-link" target="_blank"><img class="catalogo-item" src="img2/temos%20jogos%20ps3%20hd.jpg"
+                    alt="jogos ps3 hd"></a>
+        </div>
+    </section>
+
+    <script>
+        (function () {
+            const container = document.querySelector('.catalogo-container');
+            const catalogSection = document.getElementById('catalogo');
+            const catalogLink = document.getElementById('catalog-link');
+            if (!container || !catalogSection || !catalogLink) return;
+
+            const speed = 0.6; // pixels per frame
+            let rafId = null;
+            let paused = false;
+            let started = false;
+
+            function step() {
+                if (!paused) {
+                    container.scrollLeft += speed;
+                    if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+                        container.scrollLeft = 0;
+                    }
+                }
+                rafId = requestAnimationFrame(step);
+            }
+
+            function centerScroll() {
+                try {
+                    const maxScroll = container.scrollWidth - container.clientWidth;
+                    container.scrollLeft = Math.max(0, Math.floor(maxScroll / 2));
+                } catch (e) { }
+            }
+
+            function waitForImages(root) {
+                const imgs = Array.from(root.querySelectorAll('img'));
+                const promises = imgs.map(img => new Promise(resolve => {
+                    if (img.complete && img.naturalWidth !== 0) return resolve();
+                    img.addEventListener('load', resolve);
+                    img.addEventListener('error', resolve);
+                }));
+                return Promise.all(promises);
+            }
+
+            function startAutoplayOnce() {
+                if (started) return;
+                started = true;
+
+                // pausar ao entrar e retomar ao sair
+                container.addEventListener('mouseenter', () => { paused = true; });
+                container.addEventListener('mouseleave', () => { paused = false; });
+
+                // aguarda imagens carregarem, centraliza e inicia autoplay
+                waitForImages(container).then(() => {
+                    centerScroll();
+                    rafId = requestAnimationFrame(step);
+                });
+
+                // centraliza ao redimensionar
+                window.addEventListener('resize', () => {
+                    clearTimeout(window._catalogResizeTimeout);
+                    window._catalogResizeTimeout = setTimeout(() => {
+                        centerScroll();
+                    }, 120);
+                });
+            }
+
+            catalogLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                // mostrar catálogo se estiver oculto
+                if (getComputedStyle(catalogSection).display === 'none') {
+                    catalogSection.style.display = 'block';
+                    // esconder artigos de texto ao abrir o catálogo
+                    document.querySelectorAll('.texto').forEach(el => el.style.display = 'none');
+                    // esconder imagem do cabeçalho enquanto o catálogo estiver aberto
+                    const headerImg = document.querySelector('.dividi');
+                    if (headerImg) headerImg.style.display = 'none';
+                    catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    startAutoplayOnce();
+                } else {
+                    // se já visível, apenas rola para ele
+                    catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+
+            // botão Voltar dentro do catálogo: fecha e cancela autoplay
+            const closeBtn = document.getElementById('catalog-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    catalogSection.style.display = 'none';
+                    try { if (rafId) cancelAnimationFrame(rafId); } catch (e) { }
+                    started = false;
+                    // restaurar exibição dos artigos de texto
+                    document.querySelectorAll('.texto').forEach(el => el.style.display = 'block');
+                    // restaurar imagem do cabeçalho
+                    const headerImg = document.querySelector('.dividi');
+                    if (headerImg) headerImg.style.display = '';
+                    // rola para o topo da página
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+        })();
+    </script>
+    <script>
+        // Gera link do WhatsApp para cada imagem usando o alt como texto
+        (function () {
+            const WA_NUMBER = '5551998171711'; // número usado no site
+            const links = document.querySelectorAll('.wa-link');
+            if (!links.length) return;
+
+            links.forEach(a => {
+                const img = a.querySelector('img');
+                const alt = (img && img.alt) ? img.alt : 'produto';
+                const text = `Ol%C3%A1%2C%20tenho%20interesse%20neste%20produto%3A%20${encodeURIComponent(alt)}`;
+                a.href = `https://wa.me/${WA_NUMBER}?text=${text}`;
+            });
+        })();
+    </script>
+
+    <article class="texto">
+        <p>* Horario de atendimento: <span class="horario">10H AS 20 H.</span> </p>
+        <p>* Venha Se <span class="vermelho">Divertir</span> Com Agente!</p>
+        <p>* Temos Loja Fisica Venha Nos Fazer Uma Visitar!</p>
+    </article>
+
+
+
+</body>
+
+</html>
